@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>环境保护网站设计</title>
+<link href="images/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="content"><!-- 主体开始 -->
+<div class="headtop"></div>
+<div class="headtop2"><!-- 主体顶部开始 -->
+<div class="logo"></div>
+<div class="headr">
+<li><a href="#">设为首页</a> | <a href="#">加入收藏</a></li>
+<li><img src="images/tel.gif" width="258" height="31" /></li>
+</div>
+</div><!-- 主体顶部结束 -->
+<div class="menu"><!-- 主体导航开始 -->
+<li><a href="index.html">网站首页</a></li>
+<li class="line"></li>
+<li><a href="gsjj.html">环境污染</a></li>
+<li class="line"></li>
+<li><a href="fwxm.html">环境保护</a></li>
+<li class="line"></li>
+<li><a href="gcal.html">保护案例</a></li>
+<li class="line"></li>
+<li><a href="list.html">新闻动态</a></li>
+<li class="line"></li>
+<li><a href="khly.html">游客留言</a></li>
+<li class="line"></li>
+<li><a href="zhaopin.html">法律信息</a></li>
+<li class="line"></li>
+<li><a href="lianxi.html">联系我们</a></li>
+</div><!-- 主体导航结束 -->
+<div class="slider3"><!-- 主体幻灯开始 -->
+        <div class="container" id="idTransformView2">
+          <ul class="slider slider2" id="idSlider2">
+            <li><img src="images/banner.jpg"/></li>
+             <li><img src="images/banner2.jpg"/></li>
+             <li><img src="images/banner3.jpg"/></li>
+          </ul>
+          <ul class="num" id="idNum2">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+          </ul>
+        </div>
+          <script type="text/javascript">
+        var $ = function (id) {
+            return "string" == typeof id ? document.getElementById(id) : id;
+        };
+        
+        var Class = {
+          create: function() {
+            return function() {
+              this.initialize.apply(this, arguments);
+            }
+          }
+        }
+        
+        Object.extend = function(destination, source) {
+            for (var property in source) {
+                destination[property] = source[property];
+            }
+            return destination;
+        }
+        
+        var TransformView = Class.create();
+        TransformView.prototype = {
+          //容器对象,滑动对象,切换参数,切换数量
+          initialize: function(container, slider, parameter, count, options) {
+            if(parameter <= 0 || count <= 0) return;
+            var oContainer = $(container), oSlider = $(slider), oThis = this;
+        
+            this.Index = 0;//当前索引
+            
+            this._timer = null;//定时器
+            this._slider = oSlider;//滑动对象
+            this._parameter = parameter;//切换参数
+            this._count = count || 0;//切换数量
+            this._target = 0;//目标参数
+            
+            this.SetOptions(options);
+            
+            this.Up = !!this.options.Up;
+            this.Step = Math.abs(this.options.Step);
+            this.Time = Math.abs(this.options.Time);
+            this.Auto = !!this.options.Auto;
+            this.Pause = Math.abs(this.options.Pause);
+            this.onStart = this.options.onStart;
+            this.onFinish = this.options.onFinish;
+            
+            oContainer.style.overflow = "hidden";
+            oContainer.style.position = "relative";
+            
+            oSlider.style.position = "absolute";
+            oSlider.style.top = oSlider.style.left = 0;
+          },
+          //设置默认属性
+          SetOptions: function(options) {
+            this.options = {//默认值
+                Up:			true,//是否向上(否则向左)
+                Step:		5,//滑动变化率
+                Time:		10,//滑动延时
+                Auto:		true,//是否自动转换
+                Pause:		2000,//停顿时间(Auto为true时有效)
+                onStart:	function(){},//开始转换时执行
+                onFinish:	function(){}//完成转换时执行
+            };
+            Object.extend(this.options, options || {});
+          },
+          //开始切换设置
+          Start: function() {
+            if(this.Index < 0){
+                this.Index = this._count - 1;
+            } else if (this.Index >= this._count){ this.Index = 0; }
+            
+            this._target = -1 * this._parameter * this.Index;
+            this.onStart();
+            this.Move();
+          },
+          //移动
+          Move: function() {
+            clearTimeout(this._timer);
+            var oThis = this, style = this.Up ? "top" : "left", iNow = parseInt(this._slider.style[style]) || 0, iStep = this.GetStep(this._target, iNow);
+            
+            if (iStep != 0) {
+                this._slider.style[style] = (iNow + iStep) + "px";
+                this._timer = setTimeout(function(){ oThis.Move(); }, this.Time);
+            } else {
+                this._slider.style[style] = this._target + "px";
+                this.onFinish();
+                if (this.Auto) { this._timer = setTimeout(function(){ oThis.Index++; oThis.Start(); }, this.Pause); }
+            }
+          },
+          //获取步长
+          GetStep: function(iTarget, iNow) {
+            var iStep = (iTarget - iNow) / this.Step;
+            if (iStep == 0) return 0;
+            if (Math.abs(iStep) < 1) return (iStep > 0 ? 1 : -1);
+            return iStep;
+          },
+          //停止
+          Stop: function(iTarget, iNow) {
+            clearTimeout(this._timer);
+            this._slider.style[this.Up ? "top" : "left"] = this._target + "px";
+          }
+        };
+        
+        window.onload=function(){
+            function Each(list, fun){
+                for (var i = 0, len = list.length; i < len; i++) { fun(list[i], i); }
+            };
+            
+            
+            ////////////////////////test2
+            
+            var objs2 = $("idNum2").getElementsByTagName("li");
+            
+            var tv2 = new TransformView("idTransformView2", "idSlider2", 990, 3, {
+                onStart: function(){ Each(objs2, function(o, i){ o.className = tv2.Index == i ? "on" : ""; }) },//按钮样式
+                Up: false
+            });
+            
+            tv2.Start();
+            
+            Each(objs2, function(o, i){
+                o.onmouseover = function(){
+                    o.className = "on";
+                    tv2.Auto = false;
+                    tv2.Index = i;
+                    tv2.Start();
+                }
+                o.onmouseout = function(){
+                    o.className = "";
+                    tv2.Auto = true;
+                    tv2.Start();
+                }
+            })	
+        }
+        </script>
+  </div><!-- 主体幻灯结束 -->
+<div class="maintop"></div>
+<div class="main1"><!-- 主体内容开始 -->
+<div class="main_l"><!-- 主体左侧开始 -->
+<div class="leftbt">
+  <div class="xwtxt">环境保护</div>
+</div>
+<div class="leftbtnr">
+<li><a href="#">环境问题</a></li>
+<li><a href="#">环境保护的事</a></li>
+<li><a href="#">生活中的环境保护</a></li>
+<li><a href="#">环境保护措施</a></li>
+<li><a href="#">环境保护</a></li>
+</div>
+<div class="leftbt"><div class="xwtxt">联系我们</div></div>
+<div class="leftbtnr">
+<li><a href="#">联系人：吴朋</a></li>
+<li><a href="#">电话：0523-46778866</a></li>
+<li><a href="#">邮箱：kefu@jnget.com</a></li>
+<li><a href="#">客服QQ：2986375542</a></li>
+<li><a href="#">地址：泰州市海陵区春晖路 </a></li>
+</div>
+</div><!-- 主体左侧结束 -->
+<div class="mr"><!-- 主体右侧开始 -->
+<div class="mbrbt"><img src="images/gcal.gif" /></div>
+<div class="mrbtnr"><!-- 主体右侧内容开始 -->
+<div class="mrnr1">
+<div class="mbrnr">■在大力发展经济的过程中，要注重建设生态文明，加快构建生态安全屏障，确保"山川秀美、绿洲常在"
+<br />
+■坚持把解决好影响群众健康的环境问题作为发展的主要目标，在加强资源集约、节约开发的同时，更加重视改善人居环境，提高人民生活质量，建设人与自然和谐相处的环境友好型社会 <br />
+■采取最严格的措施精心保护生态功能区和著名旅游风景区，资源开发要确保对生态环境不造成大的影响回望2010年，环保工作在新疆历史上具有特殊的意义。
+　　5月17日～19日，中央召开了新疆工作座谈会，就推动新疆跨越式发展和长治久安做出重大决策部署。要求新疆在大力发展经济的过程中，注重建设生态文明，加快构建生态安全屏障，确保"山川秀美、绿洲常在"。　　自治区党委、政府迅速行动起来。
+　　5月26日，自治区党委七届九次全委(扩大)会议明确提出"环保优先，生态立区"的发展理念　　从6月10日起，自治区党委书记张春贤、自治区政府主席努尔·白克力等自治区主要领导同志分赴各地州市和厅局调研，生态环境是调研的主要内容之一。
+　　8月2日，自治区党委中心组围绕能源建设与环境保护这一主题进行了集中学习，强调指出新疆必须走"资源开发可持续、生态环境可持续"的发展道路。
+　　8月5日，自治区党委在伊犁召开"伊犁河流域生态环境保护座谈会"，研究部署伊犁河流域生态环境保护和建设，以及全区生态环境保护和建设等重要工作。
+　　
+</div>
+<p>&nbsp;</p>
+<div class="mrnrimgt">　新疆在大力发展经济的过程中，加快构建生态安全屏障，确保山川秀美、绿洲常在。图为美丽的胡杨林。
+<img src="images/morb_1.jpg" width="600" height="454" /></div>
+
+</div>
+</div>
+<!-- 主体右侧内容结束 -->
+</div><!-- 主体右侧结束 -->
+</div><!-- 主体内容结束 -->
+<div class="foot">版权所有 &copy; 网站名称 未经许可 严禁复制 <br />
+版权所有<br />
+信息来源:<a href="http://www.cfej.net/" target="_blank">中国环境信息网</a> </div>
+</div><!-- 主体结束 -->
+</body>
+</html>
